@@ -11,6 +11,7 @@
 
 #define SUCCESS 1
 #define IPLEN 16
+#define DEFAULT_IP_LEN 11
 static int client_id =0;
 
 static int client_connect(char IP_address[]) {
@@ -47,10 +48,15 @@ static int incoming_message(){
 
 int main(int argc, char *argv[]){
     char incomingIP[IPLEN];
-    strncpy(incomingIP, argv[1], IPLEN);
-    printf("%s: incoming IP %s\n", __func__, incomingIP);
+    if (argc != 2) {
+        printf("%s: argc no value setting default to 127.0.0.1\n", __func__);
+        strncpy(incomingIP,"127.0.0.1\0", DEFAULT_IP_LEN);
+    } else {
+        strncpy(incomingIP, argv[1], IPLEN);
+        printf("%s: incoming IP %s\n", __func__, incomingIP);
+    }
     client_connect(incomingIP);
     for (;;) {
         incoming_message();
-    } return 0;
+    } return 1;
 }
