@@ -1,0 +1,3 @@
+[submodule "JoystickClient/JoystickInput"]
+	path = JoystickClient/JoystickInput
+	url = https://github.com/DylanKite/EmbeddedLinuxController
