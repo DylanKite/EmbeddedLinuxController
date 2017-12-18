@@ -1,2 +1,0 @@
-# EmbeddedLinuxController
-# EmbeddedLinuxController

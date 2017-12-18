@@ -1,4 +1,0 @@
-[submodule "JoystickClient/EmbeddedLinuxController"]
-	path = JoystickClient/EmbeddedLinuxController
-	url = https://github.com/DylanKite/EmbeddedLinuxController
-	branch = master
