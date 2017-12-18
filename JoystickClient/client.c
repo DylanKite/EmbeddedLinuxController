@@ -3,16 +3,17 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <bsd/string.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include "../JoystickServer/joystickconvert.h"
 
 #define SUCCESS 1
-
+#define IPLEN 16
 static int client_id =0;
 
-static int client_connect() {
+static int client_connect(char IP_address[]) {
     int rtnValue;
     struct sockaddr_in serverAddr;
     socklen_t addr_size;
@@ -20,8 +21,8 @@ static int client_connect() {
     client_id =  socket(PF_INET, SOCK_STREAM, 0);
     serverAddr.sin_family = AF_INET;
     serverAddr.sin_port = htons(7891);
-    serverAddr.sin_addr.s_addr = inet_addr("127.0.0.1");
-
+    serverAddr.sin_addr.s_addr = inet_addr(IP_address);
+    printf("%s ip address: %s\n", __func__, IP_address);
     memset(serverAddr.sin_zero, '\0', sizeof serverAddr.sin_zero);
 
     addr_size = sizeof serverAddr;
@@ -44,9 +45,11 @@ static int incoming_message(){
     print_robot_value(translated_value);
 }
 
-int main(){
-
-    client_connect();
+int main(int argc, char *argv[]){
+    char incomingIP[IPLEN];
+    strncpy(incomingIP, argv[1], IPLEN);
+    printf("%s: incoming IP %s\n", __func__, incomingIP);
+    client_connect(incomingIP);
     for (;;) {
         incoming_message();
     } return 0;
