@@ -54,7 +54,6 @@ static void send_message() {
     long network_value = 0;
     for(;;) {
         robot_value= joystickToRobot();
-        //robot_value = 1234;
         network_value = htonl(robot_value);
 
         send(connected_socket, &network_value, sizeof(long), 0);
