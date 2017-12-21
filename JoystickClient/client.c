@@ -41,7 +41,6 @@ static int incoming_message(){
     recv(client_id, &incoming_value, sizeof(long), 0);
     translated_value = ntohl(incoming_value);
 
-    printf("%s: incoming value: %d\n", __func__, translated_value);
     print_robot_value(translated_value);
 }
 
