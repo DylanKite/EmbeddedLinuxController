@@ -14,7 +14,7 @@
 static uint32_t convert_range_to_percent(uint32_t range) {
     uint32_t converted_val = 0;
 
-    converted_val = (range*100)/MAX_16_BIT;
+    converted_val = (range*1000)/MAX_16_BIT;
     return converted_val;
 
 }
@@ -54,6 +54,34 @@ static uint32_t convert_digital_to_value(uint32_t button_val, uint32_t control_t
                 converted_value == stop;
             }
             break;
+        case x:
+            if (button_val == on) {
+                converted_value = positive;
+            } else if(button_val == off) {
+                converted_value == stop;
+            }
+            break;
+        case y:
+            if (button_val == on) {
+                converted_value = positive;
+            } else if(button_val == off) {
+                converted_value == stop;
+            }
+            break;
+        case l1:
+            if (button_val == on) {
+                converted_value = positive;
+            } else if(button_val == off) {
+                converted_value == stop;
+            }
+            break;
+        case r1:
+            if (button_val == on) {
+                converted_value = positive;
+            } else if(button_val == off) {
+                converted_value == stop;
+            }
+            break;
     }
 
     return converted_value;
@@ -83,6 +111,17 @@ static uint32_t convert_button_to_motor(uint32_t button_val) {
         case l2:
             converted_val = left_motor;
             break;
+        case r1:
+            converted_val = right_reverse;
+            break;
+        case l1:
+            converted_val = left_reverse;
+            break;
+        case x:
+            converted_val = audio_capture;
+            break;
+        case y:
+            converted_val = video_capture;
         default:
             printf("%s: button pressed: %d", __func__, button_val);
             break;
@@ -148,7 +187,7 @@ void print_robot_value(uint32_t robotValue) {
         default:
             break;
         }
-    } else if (robotValue >= home) {
+    } else if (robotValue >= home && robotValue < left_reverse) {
         btn_value = robotValue - home;
         switch (btn_value) {
         case off:
@@ -159,6 +198,66 @@ void print_robot_value(uint32_t robotValue) {
             break;
         case negative:
             printf("%s: the home is negative\n", __func__);
+            break;
+        default:
+            break;
+        }
+    } else if (robotValue >= left_reverse && robotValue < right_reverse) {
+            btn_value = robotValue - home;
+            switch (btn_value) {
+            case off:
+                printf("%s: the left reverse is off\n", __func__);
+                break;
+            case positive:
+                printf("%s: the left reverse is positive\n", __func__);
+                break;
+            case negative:
+                printf("%s: the left reverse is negative\n", __func__);
+                break;
+            default:
+                break;
+            }
+    } else if (robotValue >= right_reverse && robotValue < audio_capture) {
+        btn_value = robotValue - home;
+        switch (btn_value) {
+        case off:
+            printf("%s: the right reverse is off\n", __func__);
+            break;
+        case positive:
+            printf("%s: the right reverse is positive\n", __func__);
+            break;
+        case negative:
+            printf("%s: the right reverse is negative\n", __func__);
+            break;
+        default:
+            break;
+        }
+    } else if (robotValue >= audio_capture && robotValue < video_capture) {
+        btn_value = robotValue - home;
+        switch (btn_value) {
+        case off:
+            printf("%s: the audio capture is off\n", __func__);
+            break;
+        case positive:
+            printf("%s: the audio capture is positive\n", __func__);
+            break;
+        case negative:
+            printf("%s: the audio capture is negative\n", __func__);
+            break;
+        default:
+            break;
+        }
+    }  else if (robotValue >= video_capture) {
+        btn_value = robotValue - home;
+        switch (btn_value) {
+        case off:
+            printf("%s: the video capture is off\n", __func__);
+            break;
+        case positive:
+            printf("%s: the video capture is positive\n", __func__);
+            break;
+        case negative:
+            printf("%s: the video capture is negative\n", __func__);
             break;
         default:
             break;
