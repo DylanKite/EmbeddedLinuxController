@@ -7,6 +7,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include "../JoystickServer/joystickconvert.h"
+#include "../rs232Server/rs232Server.h"
 
 #define SUCCESS 1
 #define IPLEN 16
@@ -32,6 +33,7 @@ static int client_connect(char IP_address[]) {
         printf("%s: error connecting errno: %s\n", __func__, strerror(errno));
     }
     printf("%s: client id: %d", __func__, client_id);
+	initialize_rs232_connection();
     return SUCCESS;
 }
 
@@ -40,12 +42,14 @@ static int incoming_message(){
     uint32_t translated_value =0;
     recv(client_id, &incoming_value, sizeof(long), 0);
     translated_value = ntohl(incoming_value);
-
-    print_robot_value(translated_value);
+    send_message(translated_value);
+    //print_robot_value(translated_value);
 }
 
 int main(int argc, char *argv[]){
     char incomingIP[IPLEN];
+
+    initialize_rs232_connection();
     if (argc != 2) {
         printf("%s: argc no value setting default to 127.0.0.1\n", __func__);
         strncpy(incomingIP,"127.0.0.1\0", DEFAULT_IP_LEN);
