@@ -3,7 +3,10 @@
 #include <string.h>
 #include <stdint.h>
 #include <stdbool.h>
-
+#include <unistd.h>  /* UNIX standard function definitions */
+#include <fcntl.h>   /* File control definitions */
+#include <termios.h> /* POSIX terminal control definitions */
+#include <errno.h>   /* Error number definitions */
 #include "rs232Server.h"
 #include "../JoystickServer/joystickconvert.h"
 
@@ -15,6 +18,9 @@
 #define PROTOCAL_MESSAGE_LEN 11
 #define FORWARD true
 #define REVERSE false
+
+static int serial_fd;
+
 static int translate_to_protocal(char outgoingMessage[], uint32_t incoming_message){
 	char ascii_button_val[5] ={0};
 	uint16_t button_value;
@@ -106,9 +112,30 @@ static int translate_to_protocal(char outgoingMessage[], uint32_t incoming_messa
 	printf("%s: outgoing message: %s\n", __func__, outgoingMessage);
 	return SUCCESS;
 }
+/*
+ * used http://slackware.osuosl.org/slackware-3.3/docs/mini/Serial-Port-Programming
+ * for source of open_port and set settings for rs232 communication in initialize
+ * rs232 connection
+ */
+static int open_port(void)
+ {
+   int fd;                                   /* File descriptor for the port */
+
+   fd = open("/dev/ttyUSB0", O_RDWR | O_NOCTTY | O_NDELAY);
+
+   if (fd == -1)
+   {                                              /* Could not open the port */
+	 fprintf(stderr, "open_port: Unable to open /dev/ttyS1 - %s\n",
+			 strerror(errno));
+   }
+
+   return (fd);
+ }
+
 int send_message(uint32_t incoming_message) {
-	char to_s12[PROTOCAL_MESSAGE_LEN];
+	char to_s12[PROTOCAL_MESSAGE_LEN] = {0};
 	int translate_rtn =0;
+	int n_bytes_written =0;
 	translate_rtn = translate_to_protocal(to_s12, incoming_message);
 	switch (translate_rtn) {
 		case CHANGE_DIR:
@@ -126,9 +153,30 @@ int send_message(uint32_t incoming_message) {
 		case STOP:
 			return SUCCESS;
 	}
+	n_bytes_written = write(serial_fd, to_s12, sizeof(to_s12));
+	printf("%s: n bytes written: %d\n", __func__, n_bytes_written);
 	return SUCCESS;
 }
 int initialize_rs232_connection() {
+	struct termios options;
+
+	serial_fd = open_port();
+	if (serial_fd == -1) {
+		printf("%s: unable to open serial port closing client software\n", __func__);
+		exit(EXIT_FAILURE);
+	}
+	printf("%s: serial port opened sucessfully %d\n", __func__, serial_fd);
+
+	tcgetattr(serial_fd, &options);
+	cfsetispeed(&options, B9600);                 /* Set the baud rates to 9600 */
+	cfsetospeed(&options, B9600);
+
+	options.c_cflag &= ~PARENB;
+	options.c_cflag &= ~CSTOPB;
+	options.c_cflag &= ~CSIZE;
+	options.c_cflag |= CS8;
+
+	tcsetattr(serial_fd, TCSANOW, &options);
 
 	return SUCCESS;
 }

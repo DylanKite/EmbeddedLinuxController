@@ -33,6 +33,7 @@ static int client_connect(char IP_address[]) {
         printf("%s: error connecting errno: %s\n", __func__, strerror(errno));
     }
     printf("%s: client id: %d", __func__, client_id);
+	initialize_rs232_connection();
     return SUCCESS;
 }
 
